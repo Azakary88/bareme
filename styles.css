@@ -254,6 +254,14 @@ tr:last-child td {
   text-align: center;
 }
 
+.app-footer {
+  padding: 0 clamp(18px, 4vw, 56px) 28px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 dialog {
   width: min(980px, calc(100vw - 28px));
   border: 0;
@@ -326,6 +334,11 @@ dialog::backdrop {
   .layout {
     gap: 14px;
     padding: 14px 10px 28px;
+  }
+
+  .app-footer {
+    padding: 0 14px 22px;
+    font-size: 0.82rem;
   }
 
   .section-title,
