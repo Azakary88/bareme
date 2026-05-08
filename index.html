@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Barème sportif 2022</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Session 2026</p>
+        <h1>Notes sportives</h1>
+      </div>
+      <div class="header-actions">
+        <button id="openScaleBtn" class="secondary" type="button">Barème</button>
+        <button id="exportPdfBtn" class="secondary" type="button">PDF</button>
+        <button id="exportExcelBtn" class="primary" type="button">Excel</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel calculator">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Saisie</p>
+            <h2>Candidat et performance</h2>
+          </div>
+          <output id="scoreBadge" class="score-badge">-- / 20</output>
+        </div>
+
+        <form id="candidateForm" class="form-grid">
+          <label>
+            Nom complet
+            <input id="fullName" name="fullName" type="text" placeholder="Nom et prénom" required>
+          </label>
+          <label>
+            Matricule
+            <input id="candidateId" name="candidateId" type="text" placeholder="Ex. C-001">
+          </label>
+          <label>
+            Sexe
+            <select id="sex" name="sex" required></select>
+          </label>
+          <label>
+            Tranche d'âge
+            <select id="ageGroup" name="ageGroup" required></select>
+          </label>
+          <label>
+            Épreuve sportive
+            <select id="event" name="event" required></select>
+          </label>
+          <label>
+            Performance
+            <input id="performance" name="performance" type="number" step="0.01" min="0" placeholder="Valeur mesurée" required>
+          </label>
+          <div class="result-line">
+            <div>
+              <span>Performance retenue</span>
+              <strong id="roundedPerformance">--</strong>
+            </div>
+            <div>
+              <span>Note attribuée</span>
+              <strong id="computedScore">--</strong>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="secondary" type="reset">Effacer</button>
+            <button class="primary" type="submit">Enregistrer</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel roster">
+        <div class="section-title compact">
+          <div>
+            <p class="eyebrow">Registre</p>
+            <h2>Candidats enregistrés</h2>
+          </div>
+          <button id="clearAllBtn" class="danger" type="button">Vider</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Matricule</th>
+                <th>Sexe</th>
+                <th>Âge</th>
+                <th>Épreuve</th>
+                <th>Perf.</th>
+                <th>Retenue</th>
+                <th>Note</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="candidateRows"></tbody>
+          </table>
+        </div>
+        <p id="emptyState" class="empty-state">Aucun candidat enregistré.</p>
+      </section>
+    </main>
+
+    <dialog id="scaleDialog">
+      <form method="dialog" class="dialog-shell">
+        <div class="section-title compact">
+          <div>
+            <p class="eyebrow">Données</p>
+            <h2>Barème utilisé</h2>
+          </div>
+          <button class="secondary" value="close" type="submit">Fermer</button>
+        </div>
+        <div class="scale-actions">
+          <button id="resetScaleBtn" class="secondary" type="button">Réinitialiser</button>
+          <button id="downloadScaleBtn" class="secondary" type="button">Exporter CSV</button>
+          <label class="file-button">
+            Importer CSV
+            <input id="scaleImport" type="file" accept=".csv,text/csv">
+          </label>
+        </div>
+        <textarea id="scaleEditor" spellcheck="false"></textarea>
+        <p class="hint">Colonnes : sexe;age;epreuve;sens;performance;note. Sens : higher ou lower.</p>
+        <button id="saveScaleBtn" class="primary" type="button">Appliquer le barème</button>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
