@@ -257,15 +257,15 @@ function renderCandidates() {
   els.emptyState.hidden = state.candidates.length > 0;
   els.candidateRows.innerHTML = state.candidates.map((candidate) => `
     <tr>
-      <td>${escapeHtml(candidate.fullName)}</td>
-      <td>${escapeHtml(candidate.candidateId || "-")}</td>
-      <td>${escapeHtml(candidate.sex)}</td>
-      <td>${escapeHtml(candidate.age)}</td>
-      <td>${escapeHtml(candidate.event)}</td>
-      <td>${formatNumber(candidate.rawPerformance)} ${escapeHtml(candidate.unit)}</td>
-      <td>${formatNumber(candidate.retainedPerformance)} ${escapeHtml(candidate.unit)}</td>
-      <td><strong>${candidate.note} / 20</strong></td>
-      <td><button class="danger" type="button" data-delete="${candidate.id}">Supprimer</button></td>
+      <td data-label="Nom">${escapeHtml(candidate.fullName)}</td>
+      <td data-label="Matricule">${escapeHtml(candidate.candidateId || "-")}</td>
+      <td data-label="Sexe">${escapeHtml(candidate.sex)}</td>
+      <td data-label="Âge">${escapeHtml(candidate.age)}</td>
+      <td data-label="Épreuve">${escapeHtml(candidate.event)}</td>
+      <td data-label="Performance">${formatNumber(candidate.rawPerformance)} ${escapeHtml(candidate.unit)}</td>
+      <td data-label="Retenue">${formatNumber(candidate.retainedPerformance)} ${escapeHtml(candidate.unit)}</td>
+      <td data-label="Note"><strong>${candidate.note} / 20</strong></td>
+      <td data-label="Action"><button class="danger" type="button" data-delete="${candidate.id}">Supprimer</button></td>
     </tr>
   `).join("");
 

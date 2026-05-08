@@ -22,6 +22,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: Inter, "Segoe UI", Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 button,
@@ -77,6 +78,7 @@ button,
   cursor: pointer;
   font-weight: 750;
   white-space: nowrap;
+  touch-action: manipulation;
 }
 
 .primary {
@@ -171,7 +173,7 @@ textarea {
 
 input,
 select {
-  min-height: 44px;
+  min-height: 46px;
   padding: 0 12px;
 }
 
@@ -293,7 +295,6 @@ dialog::backdrop {
 }
 
 @media (max-width: 980px) {
-  .app-header,
   .layout {
     grid-template-columns: 1fr;
   }
@@ -302,17 +303,161 @@ dialog::backdrop {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions > button {
+    flex: 1 1 130px;
+  }
 }
 
 @media (max-width: 620px) {
+  .app-header {
+    gap: 18px;
+    padding: 22px 14px;
+  }
+
+  .app-header h1 {
+    font-size: 2rem;
+  }
+
+  .layout {
+    gap: 14px;
+    padding: 14px 10px 28px;
+  }
+
+  .section-title,
+  .section-title.compact {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .section-title h2 {
+    font-size: 1.18rem;
+  }
+
+  .score-badge {
+    width: 100%;
+  }
+
   .form-grid,
   .result-line {
     grid-template-columns: 1fr;
   }
 
+  .form-actions,
+  .scale-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-actions > button,
+  .scale-actions > button,
+  .scale-actions > .file-button,
+  #saveScaleBtn,
+  #clearAllBtn {
+    width: 100%;
+  }
+
   .calculator,
   .roster,
   .dialog-shell {
-    padding: 16px;
+    padding: 14px;
+  }
+
+  .panel {
+    border-radius: 0;
+  }
+
+  .table-wrap {
+    overflow: visible;
+    border: 0;
+  }
+
+  table,
+  thead,
+  tbody,
+  tr,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  table {
+    min-width: 0;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  tr {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  tr:last-child td {
+    border-bottom: 1px solid var(--line);
+  }
+
+  tr td:last-child {
+    border-bottom: 0;
+  }
+
+  td {
+    display: grid;
+    grid-template-columns: minmax(105px, 42%) 1fr;
+    gap: 12px;
+    padding: 10px 12px;
+    text-align: right;
+  }
+
+  td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  td button {
+    width: 100%;
+  }
+
+  dialog {
+    width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+  }
+
+  #scaleEditor {
+    min-height: 48dvh;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  button,
+  .file-button {
+    width: 100%;
+  }
+
+  td {
+    grid-template-columns: 1fr;
+    text-align: left;
   }
 }
