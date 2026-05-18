@@ -1,6 +1,6 @@
 const STORAGE_KEYS = {
   candidates: "sport_candidates_v1",
-  scale: "sport_scale_secondaire_session_2022_v1"
+  scale: "sport_scale_secondaire_session_2022_v2"
 };
 
 const DEFAULT_SCALE = buildDefaultScale();
