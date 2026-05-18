@@ -1,6 +1,6 @@
 const STORAGE_KEYS = {
   candidates: "sport_candidates_v1",
-  scale: "sport_scale_2022_v1"
+  scale: "sport_scale_secondaire_session_2022_v1"
 };
 
 const DEFAULT_SCALE = buildDefaultScale();
@@ -16,6 +16,7 @@ const els = {
   fullName: document.querySelector("#fullName"),
   candidateId: document.querySelector("#candidateId"),
   sex: document.querySelector("#sex"),
+  category: document.querySelector("#category"),
   ageGroup: document.querySelector("#ageGroup"),
   event: document.querySelector("#event"),
   performance: document.querySelector("#performance"),
@@ -45,6 +46,12 @@ function init() {
 
   els.form.addEventListener("input", updateCalculation);
   els.sex.addEventListener("change", () => {
+    populateCategories();
+    populateAgeGroups();
+    populateEvents();
+    updateCalculation();
+  });
+  els.category.addEventListener("change", () => {
     populateAgeGroups();
     populateEvents();
     updateCalculation();
@@ -69,6 +76,15 @@ function init() {
 }
 
 function buildDefaultScale() {
+  const session2022Scale = buildSession2022Scale();
+  if (Array.isArray(window.SECONDARY_SCALE) && window.SECONDARY_SCALE.length) {
+    return [...session2022Scale, ...window.SECONDARY_SCALE];
+  }
+
+  return session2022Scale;
+}
+
+function buildSession2022Scale() {
   const performanceRows = [
     { sprint: 8.4, height: 1.40, length: 4.20 },
     { sprint: 8.6, height: 1.37, length: 4.10 },
@@ -113,6 +129,7 @@ function buildDefaultScale() {
   return scales.flatMap((scale) =>
     events.flatMap((event) =>
       performanceRows.slice(scale.firstRow - 1, scale.firstRow + 19).map((row, index) => ({
+        category: "CEP",
         sex: scale.sex,
         age: scale.age,
         event: event.name,
@@ -160,14 +177,27 @@ function populateSelectors() {
   els.sex.innerHTML = unique(state.scale.map((row) => row.sex))
     .map((value) => option(value))
     .join("");
+  populateCategories();
   populateAgeGroups();
   populateEvents();
 }
 
+function populateCategories() {
+  const selectedSex = els.sex.value;
+  const previous = els.category.value;
+  const categories = unique(state.scale
+    .filter((row) => row.sex === selectedSex)
+    .map((row) => row.category || "Barème général"));
+  els.category.innerHTML = categories.map((value) => option(value, value === previous)).join("");
+}
+
 function populateAgeGroups() {
   const selectedSex = els.sex.value;
+  const selectedCategory = els.category.value;
   const previous = els.ageGroup.value;
-  const ages = unique(state.scale.filter((row) => row.sex === selectedSex).map((row) => row.age));
+  const ages = unique(state.scale
+    .filter((row) => row.sex === selectedSex && (row.category || "Barème général") === selectedCategory)
+    .map((row) => row.age));
   els.ageGroup.innerHTML = ages.map((value) => option(value, value === previous)).join("");
 }
 
@@ -184,7 +214,9 @@ function option(value, selected = false) {
 
 function rowsForSelection(includeEvent = true) {
   return state.scale.filter((row) => {
-    const base = row.sex === els.sex.value && row.age === els.ageGroup.value;
+    const base = row.sex === els.sex.value &&
+      (row.category || "Barème général") === els.category.value &&
+      row.age === els.ageGroup.value;
     return includeEvent ? base && row.event === els.event.value : base;
   });
 }
@@ -238,6 +270,7 @@ function saveCandidate(event) {
     fullName: els.fullName.value.trim(),
     candidateId: els.candidateId.value.trim(),
     sex: els.sex.value,
+    category: els.category.value,
     age: els.ageGroup.value,
     event: els.event.value,
     rawPerformance: Number(els.performance.value),
@@ -260,7 +293,8 @@ function renderCandidates() {
       <td data-label="Nom">${escapeHtml(candidate.fullName)}</td>
       <td data-label="Matricule">${escapeHtml(candidate.candidateId || "-")}</td>
       <td data-label="Sexe">${escapeHtml(candidate.sex)}</td>
-      <td data-label="Âge">${escapeHtml(candidate.age)}</td>
+      <td data-label="Barème">${escapeHtml(candidate.category || "-")}</td>
+      <td data-label="Classe / âge">${escapeHtml(candidate.age)}</td>
       <td data-label="Épreuve">${escapeHtml(candidate.event)}</td>
       <td data-label="Performance">${formatNumber(candidate.rawPerformance)} ${escapeHtml(candidate.unit)}</td>
       <td data-label="Retenue">${formatNumber(candidate.retainedPerformance)} ${escapeHtml(candidate.unit)}</td>
@@ -294,9 +328,10 @@ function openScaleEditor() {
 }
 
 function scaleToCsv(scale) {
-  const lines = ["sexe;age;epreuve;sens;performance;note;unite"];
+  const lines = ["categorie;sexe;age;epreuve;sens;performance;note;unite"];
   scale.forEach((row) => {
     lines.push([
+      row.category || "Barème général",
       row.sex,
       row.age,
       row.event,
@@ -316,16 +351,24 @@ function csvCell(value) {
 
 function parseScaleCsv(text) {
   const lines = text.split(/\r?\n/).filter((line) => line.trim());
-  const dataLines = lines[0]?.toLowerCase().startsWith("sexe;") ? lines.slice(1) : lines;
-  const parsed = dataLines.map(parseCsvLine).map((cells) => ({
-    sex: cells[0]?.trim(),
-    age: cells[1]?.trim(),
-    event: cells[2]?.trim(),
-    direction: cells[3]?.trim(),
-    performance: Number(String(cells[4]).replace(",", ".")),
-    note: Number(cells[5]),
-    unit: cells[6]?.trim() || ""
-  })).filter((row) =>
+  const firstLine = lines[0]?.toLowerCase() || "";
+  const hasHeader = firstLine.startsWith("categorie;") || firstLine.startsWith("sexe;");
+  const hasCategory = firstLine.startsWith("categorie;");
+  const dataLines = hasHeader ? lines.slice(1) : lines;
+  const parsed = dataLines.map(parseCsvLine).map((cells) => {
+    const offset = hasCategory ? 1 : 0;
+    return {
+      category: hasCategory ? cells[0]?.trim() : "Barème général",
+      sex: cells[offset]?.trim(),
+      age: cells[offset + 1]?.trim(),
+      event: cells[offset + 2]?.trim(),
+      direction: cells[offset + 3]?.trim(),
+      performance: Number(String(cells[offset + 4]).replace(",", ".")),
+      note: Number(cells[offset + 5]),
+      unit: cells[offset + 6]?.trim() || ""
+    };
+  }).filter((row) =>
+    row.category &&
     row.sex &&
     row.age &&
     row.event &&
@@ -417,7 +460,7 @@ function exportPdf() {
     `Export du ${new Date().toLocaleString("fr-FR")}`,
     "",
     ...state.candidates.flatMap((candidate) => [
-      `${candidate.fullName} | ${candidate.candidateId || "-"} | ${candidate.sex} | ${candidate.age}`,
+      `${candidate.fullName} | ${candidate.candidateId || "-"} | ${candidate.sex} | ${candidate.category || "-"} | ${candidate.age}`,
       `${candidate.event} | perf. ${formatNumber(candidate.rawPerformance)} ${candidate.unit} | retenue ${formatNumber(candidate.retainedPerformance)} ${candidate.unit} | note ${candidate.note}/20`,
       ""
     ])
@@ -426,11 +469,12 @@ function exportPdf() {
 }
 
 function buildExportTable() {
-  const headings = ["Nom", "Matricule", "Sexe", "Age", "Epreuve", "Performance", "Performance retenue", "Note", "Date"];
+  const headings = ["Nom", "Matricule", "Sexe", "Barème", "Classe / age", "Epreuve", "Performance", "Performance retenue", "Note", "Date"];
   const rows = state.candidates.map((candidate) => [
     candidate.fullName,
     candidate.candidateId || "-",
     candidate.sex,
+    candidate.category || "-",
     candidate.age,
     candidate.event,
     `${formatNumber(candidate.rawPerformance)} ${candidate.unit}`,

@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Barème sportif 2022</title>
+    <title>Barèmes sportifs secondaire</title>
     <link rel="stylesheet" href="styles.css?v=responsive-2">
   </head>
   <body>
     <header class="app-header">
       <div>
-        <p class="eyebrow">Session 2026</p>
+        <p class="eyebrow">Niveau secondaire</p>
         <h1>Notes sportives</h1>
       </div>
       <div class="header-actions">
@@ -43,7 +43,11 @@
             <select id="sex" name="sex" required></select>
           </label>
           <label>
-            Tranche d'âge
+            Type de barème
+            <select id="category" name="category" required></select>
+          </label>
+          <label>
+            Classe / âge
             <select id="ageGroup" name="ageGroup" required></select>
           </label>
           <label>
@@ -86,7 +90,8 @@
                 <th>Nom</th>
                 <th>Matricule</th>
                 <th>Sexe</th>
-                <th>Âge</th>
+                <th>Barème</th>
+                <th>Classe / âge</th>
                 <th>Épreuve</th>
                 <th>Perf.</th>
                 <th>Retenue</th>
@@ -123,11 +128,12 @@
           </label>
         </div>
         <textarea id="scaleEditor" spellcheck="false"></textarea>
-        <p class="hint">Colonnes : sexe;age;epreuve;sens;performance;note. Sens : higher ou lower.</p>
+        <p class="hint">Colonnes : categorie;sexe;age;epreuve;sens;performance;note;unite. Sens : higher ou lower.</p>
         <button id="saveScaleBtn" class="primary" type="button">Appliquer le barème</button>
       </form>
     </dialog>
 
-    <script src="app.js?v=responsive-2"></script>
+    <script src="secondary-scale.js?v=secondaire-1"></script>
+    <script src="app.js?v=secondaire-1"></script>
   </body>
 </html>
